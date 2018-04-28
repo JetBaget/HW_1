@@ -29,9 +29,9 @@ def is_verb(word):
     return pos_info[0][1] == 'VB'
 
 
-def collect_pyfile_names_in_path(inspected_path):
+def collect_pyfiles_in_path(inspected_path):
     """
-    Возвращает список имен .py-файлов, найденных рекурсивно в директории dir_path
+    Возвращает список .py-файлов, найденных рекурсивно в директории dir_path
 
     :param inspected_path:      Путь к директории, где будет выполняться поиск .py-файлов
     :return:                    list
@@ -47,19 +47,20 @@ def collect_pyfile_names_in_path(inspected_path):
     return pathes_to_pyfiles
 
 
-def create_syntax_trees(pathes_to_pyfiles, with_file_names=False, with_file_content=False):
+def create_syntax_trees(inspected_path, with_file_names=False, with_file_content=False):
     """
     Возвращает список абстрактных синтаксических деревьев для всех .py файлов,
     содержащихся в указанной директории/поддиректориях.
     В зависимости от значений ключей with_file_names, with_file_content добавляется
     информация об имени файла и его содержимом, соответственно.
 
-    :param pathes_to_pyfiles:           Список путей к .py-файлам
+    :param inspected_path:              Путь к директории, где будет выполняться поиск .py-файлов
     :param with_file_names:             Флаг, добавляющий название файла
     :param with_file_content:           Флаг, добавляющий содержимое файла
     :return:                            list
     """
     trees = []
+    pathes_to_pyfiles = collect_pyfiles_in_path(inspected_path)
     for py_file_path in pathes_to_pyfiles:
         with open(py_file_path, 'r', encoding='utf-8') as attempt_handler:
             main_file_content = attempt_handler.read()
@@ -158,14 +159,16 @@ def pick_top_verbs(path, top_size=10):
 
 
 if __name__ == '__main__':
-    path = str(input('Введите путь к директории, содержащей проект:\n'))
+    path = str(input('Введите путь к директории, содержащей проект на python:\n'))
     if not os.path.exists(path):
         print('Указанный путь не существует в файловой системе')
         exit(1)
     try:
         print('Наиболее часто используемые глаголы:')
+        print('='*19)
         for pair in pick_top_verbs(path):
-            print('глагол: {}, количество: {}'.format(*pair))
+            print('| {:10s} | {:2d} |'.format(*pair))
+        print('=' * 19)
     except (FileNotFoundError, OSError) as err:
         print('Ошибка: {}'.format(err))
         exit(1)
